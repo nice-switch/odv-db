@@ -20,6 +20,7 @@ class DatabaseService():
             self.sqlite_connection.create_tables(model.AVAILABLE_MODELS)
             self.sqlite_connection.commit()
     
+
     def create_account(self, username: str, password: str) -> interface.AccountInterface | None:
         # Checking if an account already exists with this username.
         if self.get_account(username=username):
@@ -30,8 +31,13 @@ class DatabaseService():
         model.database_connection.initialize(self.sqlite_connection)
         model.Account.create(username=username, password=password, salt="", blob="")
             
-
-        #self.sqlite_connection.commit()
+        return interface.AccountInterface(
+            account_model=self.get_account(
+                username=username,
+            ),
+            new_account=True
+        )
+    
 
     def get_account(self, username: str) -> interface.AccountInterface | None:
         account_model: model.Account | None = None

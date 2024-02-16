@@ -1,7 +1,6 @@
 import database
 
 
-
 database_service_a = database.service.DatabaseService(
     sqlite_path="workspace/database.sqlite"
 )
