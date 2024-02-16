@@ -2,7 +2,6 @@ import peewee
 
 from database import model, interface
 
-
 class DatabaseService():
     def __init__(self, sqlite_path: str | None = None):
         # SQLite value initialization.
@@ -28,7 +27,7 @@ class DatabaseService():
 
         # Create an account in the database.
         with self.sqlite_connection.atomic() as _:
-            model.Account.create(username=username, password=password)
+            model.Account.create(username=username, password=password, salt="", blob="")
 
     def get_account(self, username: str) -> interface.AccountInterface | None:
         account_model: model.Account | None = None
@@ -37,7 +36,7 @@ class DatabaseService():
         try:
             with self.sqlite_connection.atomic() as _:
                 return model.Account.get(model.Account.username==username)
-        except _:
+        except Exception as _:
             pass
 
         if account_model is not None:
