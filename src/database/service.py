@@ -26,19 +26,25 @@ class DatabaseService():
             return None
 
         # Create an account in the database.
-        with self.sqlite_connection.atomic() as _:
-            model.Account.create(username=username, password=password, salt="", blob="")
+        # NOTE this is prob not the best thing to do but it works!
+        model.database_connection.initialize(self.sqlite_connection)
+        model.Account.create(username=username, password=password, salt="", blob="")
+            
+
+        #self.sqlite_connection.commit()
 
     def get_account(self, username: str) -> interface.AccountInterface | None:
         account_model: model.Account | None = None
 
         # Attempting to retrieve account from database.
         try:
-            with self.sqlite_connection.atomic() as _:
-                return model.Account.get(model.Account.username==username)
+            # TODO this is prob not good but it works!
+            model.database_connection.initialize(self.sqlite_connection)
+            account_model = model.Account.get(model.Account.username==username)
         except Exception as _:
             pass
-
+        
+        # If account is found create interface!
         if account_model is not None:
             return interface.AccountInterface(
                 account_model=account_model
