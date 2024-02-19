@@ -22,6 +22,21 @@ class DatabaseService():
     
 
     def create_account(self, username: str, password: str) -> interface.AccountInterface | None:
+        """Top level interface for creating an account.
+
+        Args:
+            username (str): Target username for the new account.
+            password (str): Raw password for the account.
+
+        Raises:
+            Exception: If an account already exists.
+            Exception: If the username fails the username requirements.
+
+        Returns:
+            interface.AccountInterface | None: AccountInterface if successfully created.
+        """
+        # TODO username requirements check
+
         # Checking if an account already exists with this username.
         if self.get_account(username=username):
             raise Exception("An account already exists with that username!")
@@ -66,6 +81,3 @@ class DatabaseService():
             )
         else:
             return account_model
-
-
-        return None
