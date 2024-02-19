@@ -24,7 +24,7 @@ class DatabaseService():
     def create_account(self, username: str, password: str) -> interface.AccountInterface | None:
         # Checking if an account already exists with this username.
         if self.get_account(username=username):
-            return None
+            raise Exception("An account already exists with that username!")
 
         # Create an account in the database.
         # NOTE this is prob not the best thing to do but it works!
@@ -34,12 +34,21 @@ class DatabaseService():
         return interface.AccountInterface(
             account_model=self.get_account(
                 username=username,
-            ),
-            new_account=True
+                create_account_interface=False
+            )
         )
     
 
-    def get_account(self, username: str) -> interface.AccountInterface | None:
+    def get_account(self, username: str, create_account_interface: bool | None = True) -> interface.AccountInterface | model.Account | None:
+        """Top level interface for retrieving an account.
+
+        Args:
+            username (str): Target username of the account you want to find.
+            create_account_interface (bool | None, optional): If it should return with an AccountInterface or Account peewee model. Defaults to True.
+
+        Returns:
+            interface.AccountInterface | model.Account | None: If it doesn't find an account it will return None.
+        """
         account_model: model.Account | None = None
 
         # Attempting to retrieve account from database.
@@ -51,9 +60,12 @@ class DatabaseService():
             pass
         
         # If account is found create interface!
-        if account_model is not None:
+        if account_model is not None and create_account_interface:
             return interface.AccountInterface(
                 account_model=account_model
             )
+        else:
+            return account_model
+
 
         return None
