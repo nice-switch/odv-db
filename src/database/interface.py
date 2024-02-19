@@ -8,13 +8,13 @@ class AccountInterface():
         return self.account_model.username
     
     def get_hashed_password(self) -> str:
-        return self.account_model.get("password")
+        return self.account_model.password
     
     def get_salt(self) -> str:
-        return self.account_model.get("salt")
+        return self.account_model.salt
 
     def get_blob(self) -> str:
-        return self.account_model.get("blob")
+        return self.account_model.blob
 
 
     
