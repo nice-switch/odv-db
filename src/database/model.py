@@ -10,6 +10,7 @@ class BaseModel(peewee.Model):
 class Account(BaseModel):
     username = peewee.TextField(primary_key=True, index=True, unique=True)
     password = peewee.TextField()
+    nonce = peewee.TextField()
     salt = peewee.TextField()
     blob = peewee.TextField()
 

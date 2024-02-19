@@ -1,6 +1,6 @@
 import peewee
 
-from database import model, interface
+from database import model, interface, secure
 
 class DatabaseService():
     def __init__(self, sqlite_path: str | None = None):
@@ -41,12 +41,16 @@ class DatabaseService():
         if self.get_account(username=username):
             raise Exception("An account already exists with that username!")
 
+        # Generate salt, hash and encryption key.
+        salt, password_hash, encryption_key = secure.hash_password(password)
+        encrypted_data, nonce = secure.encrypt_data(b'[]', encryption_key)
+
         # Create an account in the database.
         # NOTE this is prob not the best thing to do but it works!
         self.__override_database_connection_with_self() #model.database_connection.initialize(self.sqlite_connection)
 
         # Creating the account! OMG!
-        account_model =  model.Account.create(username=username, password=password, salt="", blob="")
+        account_model =  model.Account.create(username=username, password=password_hash.hex(), salt=salt.hex(), nonce=nonce.hex(), blob=encrypted_data.hex())
         
         # Wrapping the account model in an interface for easy handling!
         return interface.AccountInterface(

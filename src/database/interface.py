@@ -7,7 +7,7 @@ class AccountInterface():
     def get_username(self) -> str:
         return self.account_model.username
     
-    def get_hashed_password(self) -> str:
+    def get_password(self) -> str:
         return self.account_model.password
     
     def get_salt(self) -> str:
