@@ -10,7 +10,7 @@ def hash_password(password: str, salt_length: int | None = 32) -> tuple[bytes, b
 
     Args:
         password (str): Target password to hash.
-        salt_length (int | None, optional): Salt to hash to prevent rainbow attacks. Defaults to 16.
+        salt_length (int | None, optional): Salt to prevent rainbow attacks. Defaults to 32.
 
     Returns:
         bytes: password salt
@@ -21,9 +21,6 @@ def hash_password(password: str, salt_length: int | None = 32) -> tuple[bytes, b
     keys = PBKDF2(password, salt, 64, count=1000000, hmac_hash_module=SHA512)
     password_hash = keys[:32]
     encryption_key = keys[32:]
-
-    print(password_hash.hex())
-    print(encryption_key.hex())
 
     return salt, password_hash, encryption_key
 
