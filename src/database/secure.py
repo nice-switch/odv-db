@@ -1,12 +1,11 @@
 # So, to keep service clean I'm going to handle encryption, decryption herer so it's nice and contained :)
-from Crypto.Protocol.KDF import PBKDF2
+from Crypto.Protocol.KDF import scrypt
 from Crypto.Cipher import AES
-from Crypto.Hash import SHA512
 from Crypto.Random import get_random_bytes
 
 
-def hash_password(password: str, salt_length: int | None = 32) -> tuple[bytes, bytes, bytes]:
-    """Converts password into PBKDF2 hash.
+def hash_password(password: str, salt: bytes | None = None, salt_length: int | None = 32) -> tuple[bytes, bytes, bytes]:
+    """Converts password into scrypt hash.
 
     Args:
         password (str): Target password to hash.
@@ -17,10 +16,12 @@ def hash_password(password: str, salt_length: int | None = 32) -> tuple[bytes, b
         bytes: password hash
         bytes: encryption key
     """
-    salt = get_random_bytes(salt_length)
-    keys = PBKDF2(password, salt, 64, count=1000000, hmac_hash_module=SHA512)
-    password_hash = keys[:32]
-    encryption_key = keys[32:]
+
+    salt = salt or get_random_bytes(salt_length)
+    keys = scrypt(password, salt, 32, N=2**16, r=8, p=1, num_keys=2)
+
+    password_hash = keys[0]
+    encryption_key = keys[1]
 
     return salt, password_hash, encryption_key
 

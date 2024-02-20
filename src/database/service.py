@@ -43,14 +43,14 @@ class DatabaseService():
 
         # Generate salt, hash and encryption key.
         salt, password_hash, encryption_key = secure.hash_password(password)
-        encrypted_data, nonce = secure.encrypt_data(b'[]', encryption_key)
+        encrypted_data, nonce = secure.encrypt_data(b'Hello world', encryption_key)
 
         # Create an account in the database.
         # NOTE this is prob not the best thing to do but it works!
         self.__override_database_connection_with_self() #model.database_connection.initialize(self.sqlite_connection)
 
         # Creating the account! OMG!
-        account_model =  model.Account.create(username=username, password=password_hash.hex(), salt=salt.hex(), nonce=nonce.hex(), blob=encrypted_data.hex())
+        account_model =  model.Account.create(username=username, password=password_hash.hex(), salt=salt.hex(), email = "", nonce=nonce.hex(), blob=encrypted_data.hex())
         
         # Wrapping the account model in an interface for easy handling!
         return interface.AccountInterface(
