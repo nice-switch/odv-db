@@ -4,7 +4,7 @@ import database
 # Hear me out, we make it again but simpler and less convolution/abstraction maybe?
 # Idk im gonna wing it.
 
-
+print(database.secure.hash_password("apsodigjadspogiha", num_hashes=2))
 
 """
 database_service = database.service.DatabaseService(

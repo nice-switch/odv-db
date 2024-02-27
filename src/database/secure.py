@@ -6,7 +6,7 @@ from Crypto.Random import get_random_bytes
 
 # NOTE do I want to keep the hash length static(32)?
 # TODO possibly extract these values into static variables.
-def hash_password(password: bytes, salt_override: bytes | None, num_hashes: int | None = 1) -> bytes | list[bytes]:
+def hash_password(password: bytes, salt_override: bytes | None = None, num_hashes: int | None = 1) -> tuple[bytes, bytes] | tuple[list[bytes], bytes]:
     """Hashes the password along with the salt provided or generated when none is given.
 
     Args:
@@ -15,9 +15,10 @@ def hash_password(password: bytes, salt_override: bytes | None, num_hashes: int 
         num_hashes (int | None, optional): How many hashes are generated. Defaults to 1.
 
     Returns:
-        bytes | list[bytes]: _description_
+        tuple[bytes, bytes] | tuple[list[bytes], bytes]: First bytes or list[bytes] contain the hash/hashes, second value is the salt used for the hash.
     """
-    return scrypt(password, salt_override or get_random_bytes(32), 32, N=2**14, r=8, p=1, num_keys=num_hashes)
+    salt = salt_override or get_random_bytes(32)
+    return scrypt(password, salt, 32, N=2**14, r=8, p=1, num_keys=num_hashes), salt
 
 
 

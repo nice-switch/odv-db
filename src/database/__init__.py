@@ -1,2 +1,2 @@
-from database import model, interface
+from database import model, interface, secure
 
