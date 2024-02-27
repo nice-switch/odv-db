@@ -29,6 +29,7 @@ def change_database_to(target_database: peewee.Database, create_tables: bool | N
 
     Args:   
         target_database (peewee.Database): peewee.SqliteDatabase, peewee.PostgresqlDatabase, etc,.
+        create_tables (bool | None): If it should use .create_tables([...])
     """
     database_connection.initialize(target_database)
 
@@ -36,3 +37,5 @@ def change_database_to(target_database: peewee.Database, create_tables: bool | N
         database_connection.create_tables([
             Account
         ])
+
+        database_connection.commit()

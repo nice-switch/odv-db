@@ -1,3 +1,5 @@
+import json
+
 from database import model, interface, secure
 
 
@@ -29,5 +31,33 @@ def get_account(username: str) -> interface.AccountInterface | None:
     return None
 
 
-def create_account(username: str, password: str) -> interface.AccountInterface | None:
-    pass
+def create_account(username: str, password: str, email: str | None = None) -> interface.AccountInterface | None:
+    if not get_account(username):
+        return None
+    
+    # hashes[0] is comparison hash
+    # hashes[1] is the AES256 key for blob.
+    hashes, salt = secure.hash_password(
+        password=password.encode(),
+        num_hashes=2
+    )
+
+    encrypted_data, nonce = secure.encrypt_data(
+        password=hashes[1],
+        data=b'["Hello", "World!"]'
+    )
+
+    new_account = model.Account.create(
+        email = email or "",
+        username=username,
+        password=hashes[0].hex(),
+        nonce=nonce.hex(),
+        salt=salt.hex(),
+        blob=encrypted_data.hex()
+    )
+
+    new_interface = interface.AccountInterface(
+        account_model=new_account
+    )
+
+    return new_interface
