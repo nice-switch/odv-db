@@ -34,3 +34,8 @@ def encrypt_data(password: bytes, data: bytes) -> tuple[bytes, bytes]:
     """
     cipher = AES.new(password, mode=AES.MODE_EAX)
     return cipher.encrypt(data), cipher.nonce
+
+
+def decrypt_data(password: bytes, nonce: bytes, data: bytes) -> bytes:
+    cipher = AES.new(password, mode=AES.MODE_EAX, nonce=nonce)
+    return cipher.decrypt(data)

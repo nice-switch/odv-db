@@ -18,7 +18,7 @@ def get_account(username: str) -> interface.AccountInterface | None:
     try:
         # TODO include use for model.change_database_to later after I make my planned changes.
         account_model = model.Account.get(
-            username==username
+            model.Account.username==username
         )
     except Exception as _:
         pass
@@ -32,7 +32,7 @@ def get_account(username: str) -> interface.AccountInterface | None:
 
 
 def create_account(username: str, password: str, email: str | None = None) -> interface.AccountInterface | None:
-    if not get_account(username):
+    if get_account(username):
         return None
     
     # hashes[0] is comparison hash
@@ -44,7 +44,7 @@ def create_account(username: str, password: str, email: str | None = None) -> in
 
     encrypted_data, nonce = secure.encrypt_data(
         password=hashes[1],
-        data=b'["Hello", "World!"]'
+        data=b'{"Hello": "World!"}'
     )
 
     new_account = model.Account.create(
@@ -55,6 +55,8 @@ def create_account(username: str, password: str, email: str | None = None) -> in
         salt=salt.hex(),
         blob=encrypted_data.hex()
     )
+
+    new_account.save()
 
     new_interface = interface.AccountInterface(
         account_model=new_account
