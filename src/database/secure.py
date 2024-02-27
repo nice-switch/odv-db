@@ -33,5 +33,4 @@ def encrypt_data(password: bytes, data: bytes) -> tuple[bytes, bytes]:
         tuple[bytes, bytes]: Encrypted data, AES nonce.
     """
     cipher = AES.new(password, mode=AES.MODE_EAX)
-
     return cipher.encrypt(data), cipher.nonce
