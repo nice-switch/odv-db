@@ -8,12 +8,13 @@ from database import model, secure
 class AccountInterface():
     def __init__(self, account_model: model.Account):
         self.account_model: model.Account = account_model
-    
+
 
     def decrypt_data(self, password: str) -> dict | None:
         decrypted_data: dict | None = None
 
         try:
+            # TODO is this the cleanest it can be?...
             aes_password = secure.hash_password(
                 password=password.encode(),
                 salt_override=bytes.fromhex(self.account_model.salt),
@@ -33,5 +34,31 @@ class AccountInterface():
         return decrypted_data
 
 
-    def update_password(self, new_password: str, old_password: str | None = None, new_account: bool | None = False) -> bool:
+    def update_data(self, password: str, data: dict) -> bool:
         pass
+    
+
+    def update_password(self, new_password: str, old_password: str | None = None) -> bool:
+        decrypted_data = self.decrypt_data(old_password)
+
+        if decrypted_data is not None:
+            print("GO!")
+            hashes, salt = secure.hash_password(new_password, num_hashes=2)
+
+            authorization_key = hashes[0]
+            encryption_key = hashes[1]
+            
+            encrypted_data, nonce = secure.encrypt_data(encryption_key, json.dumps(decrypted_data).encode())
+
+            self.account_model.password = authorization_key.hex()
+            self.account_model.salt = salt.hex()
+
+            self.account_model.nonce = nonce.hex()
+            self.account_model.blob = encrypted_data.hex()
+
+            self.account_model.save()
+
+            return True
+
+        return False
+            
