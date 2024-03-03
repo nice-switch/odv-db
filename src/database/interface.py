@@ -35,14 +35,42 @@ class AccountInterface():
 
 
     def update_data(self, password: str, data: dict) -> bool:
-        pass
+        hashes, _ = secure.hash_password(password, salt_override=bytes.fromhex(self.account_model.salt), num_hashes=2)
+
+        authorization_password = hashes[0]
+
+        if bytes.fromhex(self.account_model.password) == authorization_password:
+            # TODO decrypt existing data and merge data
+
+            new_hashes, salt = secure.hash_password(password, num_hashes=2)
+            
+            new_authorization_password = new_hashes[0]
+            new_encryption_password = new_hashes[1]
+
+            encrypted_data, nonce = secure.encrypt_data(
+                new_encryption_password,
+                json.dumps(data).encode()
+            )
+
+            self.account_model.password = new_authorization_password.hex()
+            self.account_model.nonce = nonce.hex()
+            self.account_model.salt = salt.hex()
+            self.account_model.blob = encrypted_data.hex()
+
+            self.account_model.save()
+
+            return True
+        
+        return False
+
+
     
 
     def update_password(self, new_password: str, old_password: str | None = None) -> bool:
         decrypted_data = self.decrypt_data(old_password)
 
         if decrypted_data is not None:
-            print("GO!")
+    
             hashes, salt = secure.hash_password(new_password, num_hashes=2)
 
             authorization_key = hashes[0]

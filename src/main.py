@@ -4,16 +4,14 @@ import database
 # Hear me out, we make it again but simpler and less convolution/abstraction maybe?
 # Idk im gonna wing it.
 
-sqlite_connection = database.model.peewee.SqliteDatabase(":memory:")
+sqlite_connection = database.model.peewee.SqliteDatabase("workspace/database.sqlite")
 database.model.change_database_to(sqlite_connection, create_tables=True)
 
-
-new_account = database.create_account(
+account = database.create_account(
     username="john_doe",
     password="password123"
-)
+) or database.get_account("john_doe")
 
-print('init passwd check', new_account.decrypt_data("password123"))
-print('password changed!', new_account.update_password("testpassword", "password123"))
-print('trying old password', new_account.decrypt_data("password123"))
-print('trying new password', new_account.decrypt_data("testpassword"))
+
+print("Data Update Successful?", account.update_data("password123", {"dees": "nuts"}))
+print("Decryption attempt: ", account.decrypt_data("password123"))
